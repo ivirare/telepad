@@ -29,8 +29,10 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     # Third-party
     "rest_framework",
+    "taggit",
     # Local apps
     "users.apps.UsersConfig",
+    "app.apps.AppConfig",
     # Security
     "csp",
 ]
@@ -132,3 +134,6 @@ AUTH_USER_MODEL = "users.User"
 AUTHENTICATION_BACKENDS = [
     "users.backends.TelegramAuthBackend",
 ]
+
+# -- TAGGIT --
+TAGGIT_CASE_INSENSITIVE = True
