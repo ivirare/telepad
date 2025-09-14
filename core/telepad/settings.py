@@ -15,6 +15,9 @@ SECRET_KEY = env("DJANGO_SECRET_KEY")
 DEBUG = env.bool("DJANGO_DEBUG", default=False)
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost"])
 
+# -- VARIABLES --
+SOUNDS_DIR = BASE_DIR.parent + "sounds/"
+
 # -- APPLICATIONS --
 INSTALLED_APPS = [
     # Django defaults
