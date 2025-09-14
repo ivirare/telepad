@@ -1,46 +1,28 @@
 from rest_framework.response import Response
-from .serializers import (
-    SignupSerializer,
-    LoginSerializer,
-)
+from .serializers import TelegramAuthSerializer
 from django.contrib.auth import login, logout
-from rest_framework import permissions, status, generics, views
-
-
-class SignupAPIView(generics.CreateAPIView):
-    permission_classes = (permissions.AllowAny,)
-    serializer_class = SignupSerializer
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.save()
-
-        login(request, user, backend="users.backends.TelegramAuthBackend")
-
-        return Response(
-            serializer.data,
-            status=status.HTTP_201_CREATED,
-        )
+from rest_framework import permissions, status, views, generics
 
 
 class LoginAPIView(generics.GenericAPIView):
     permission_classes = (permissions.AllowAny,)
-    serializer_class = LoginSerializer
+    serializer_class = TelegramAuthSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(
-            data=request.data, context={"request": request}
-        )
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+
         user = serializer.validated_data["user"]
+        created = serializer.validated_data["created"]
 
-        login(request, user)
+        login(request, user, backend="users.backends.TelegramAuthBackend")
 
-        return Response(
-            serializer.data,
-            status=status.HTTP_200_OK,
-        )
+        if created:
+            status_code = status.HTTP_201_CREATED
+        else:
+            status_code = status.HTTP_200_OK
+
+        return Response(serializer.data, status=status_code)
 
 
 class LogoutAPIView(views.APIView):
@@ -49,6 +31,5 @@ class LogoutAPIView(views.APIView):
     def post(self, request, *args, **kwargs):
         logout(request)
         return Response(
-            {"detail": "Successfully logged out"},
-            status=status.HTTP_200_OK,
+            {"detail": "Successfully logged out."}, status=status.HTTP_200_OK
         )

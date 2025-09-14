@@ -1,38 +1,27 @@
 from rest_framework import serializers
-from rest_framework.validators import UniqueValidator
 from .models import User
-from django.contrib.auth import authenticate
 
 
-class SignupSerializer(serializers.ModelSerializer):
-    telegram_id = serializers.IntegerField(
-        validators=[UniqueValidator(queryset=User.objects.all())]
-    )
-
-    username = serializers.CharField(required=False, max_length=255)
-
-    class Meta:
-        model = User
-        fields = ("telegram_id", "username")
-
-    def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
-
-
-class LoginSerializer(serializers.Serializer):
+class TelegramAuthSerializer(serializers.Serializer):
     telegram_id = serializers.IntegerField(required=True)
+    username = serializers.CharField(required=False, allow_blank=True)
+    # if needed: first_name = serializers.CharField(required=False)
+    # if needed: last_name = serializers.CharField(required=False)
+    # probably would be nice: photo_url = serializers.URLField(required=False)
+    # after integrating telegram widget: hash = serializers.CharField(required=True)
 
     def validate(self, attrs):
-        telegram_id = attrs.get("telegram_id")
-        request = self.context.get("request")
-        user = authenticate(request=request, telegram_id=telegram_id)
+        # After integrating the telegram widget there should be hash validation
 
-        if not user:
-            raise serializers.ValidationError(
-                "Unable to log in with provided credentials", code="authorization"
-            )
+        telegram_id = attrs.get("telegram_id")
+        username = attrs.get("username")
+
+        user, created = User.objects.update_or_create(
+            telegram_id=telegram_id, defaults={"username": username}
+        )
 
         attrs["user"] = user
+        attrs["created"] = created
         return attrs
 
 
