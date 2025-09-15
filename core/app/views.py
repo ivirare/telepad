@@ -15,10 +15,6 @@ class SoundViewSet(
 ):
     serializer_class = SoundSerializer
     permission_classes = (permissions.IsAuthenticated,)
-    forbidden_message = Response(
-        {"detail": "You are not the owner of this sound."},
-        status=status.HTTP_403_FORBIDDEN,
-    )
 
     # Default list query
     def get_queryset(self):
