@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.db.models import Count, Q, OuterRef, Exists
 
 from .models import Sound
-from .serializers import SoundSerializer
+from .serializers import SoundSerializer, DownloadSerializer
 from .permissions import SoundPermission
 from .tasks.downloads import download_sound
 
@@ -79,9 +79,13 @@ class SoundViewSet(
 
 @api_view(["POST"])
 def download(request):
-    url = request.data.get("url")
+    serializer = DownloadSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    url = serializer.validated_data.get("url")
+
     task = download_sound.delay(request.user.id, url)
+
     return Response(
-        {"detail": f"Started task with id {task.id}."},
+        {"detail": "Download task started.", "task_id": task.id},
         status=status.HTTP_202_ACCEPTED,
     )

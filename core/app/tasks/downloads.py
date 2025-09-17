@@ -19,8 +19,13 @@ def download_sound(pk: int, url: str):
             file=filepath,
             is_private=True,
         )
-        output = {"status": "ok", "sound_id": sound.id, "name": sound.name}
+        return {
+            "status": "ok",
+            "sound_id": sound.id,
+            "name": sound.name,
+        }
     except Exception as error:
-        output = {"status": "failed", "detail": f"{error}"}
-
-    return output
+        return {
+            "status": "failed",
+            "detail": f"{error}",
+        }

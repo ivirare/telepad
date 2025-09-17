@@ -7,7 +7,7 @@ class LargeSizeError(Exception):
         super().__init__(*args)
 
 
-def get_filesize(url: str) -> int | None:
+def get_metadata(url: str) -> dict:
     ydl_opts = {
         "format": "bestaudio",
         "quiet": True,
@@ -15,11 +15,17 @@ def get_filesize(url: str) -> int | None:
     }
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=False)
-        return info.get("filesize") or info.get("filesize_approx")
+        return info
+
+
+def get_filesize(info: dict) -> int | None:
+    return info.get("filesize") or info.get("filesize_approx")
 
 
 def download_and_convert(url: str, user_id: int, max_size: int = 5) -> str:
-    filesize = get_filesize(url)
+    info = get_metadata(url)
+    # Could check for file existence here; ydl.prepare_filename(info).rsplit(".", 1)[0]
+    filesize = get_filesize(info)
     if filesize and (filesize / 1024 / 1024) > max_size:
         raise LargeSizeError(f"Estimated file size exceeds {max_size}MB.")
 
@@ -47,6 +53,6 @@ def download_and_convert(url: str, user_id: int, max_size: int = 5) -> str:
     with YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(url, download=True)
         return (
-            ydl.prepare_filename(info).rsplit("/", 1)[1].rsplit(".", 1)[0] + ".ogg",
+            ydl.prepare_filename(info).rsplit("/", 1)[1],
             info.get("title"),
         )
