@@ -13,8 +13,8 @@ services:
     command: gunicorn -c gunicorn.conf.py telepad.wsgi:application
     volumes:
       - ./core:/app
-      - ./media:/app/media
-      - ./static:/app/static
+      - ./media:/media
+      - ./static:/static
     env_file: .env
     depends_on:
       - db
@@ -25,7 +25,7 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./media:/media
-      - ./static:/app/static
+      - ./static:/static
     ports:
       - "80:80"
     depends_on:
@@ -36,7 +36,7 @@ services:
     command: celery -A telepad worker -l info
     volumes:
       - ./core:/app
-      - ./media:/app/media
+      - ./media:/media
     env_file: .env
     depends_on:
       - db
