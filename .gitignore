@@ -15,5 +15,4 @@ migrations/
 
 # Other
 media/
-static/
 *.log

@@ -1,3 +1,4 @@
+# -- IMPORTS --
 from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.decorators import action, api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -11,6 +12,7 @@ from .permissions import SoundPermission
 from .tasks.downloads import download_sound, upload_sound
 
 
+# -- SOUNDS MODEL --
 class SoundViewSet(
     mixins.RetrieveModelMixin,
     mixins.UpdateModelMixin,
@@ -40,14 +42,12 @@ class SoundViewSet(
     def get_serializer_context(self):
         return {"request": self.request}
 
-    # --- Custom Actions ---
-
     @action(detail=False, methods=["get"], url_path="all")
     def list_all(self, request):
         serializer = self.get_serializer(self.get_queryset(), many=True)
         return Response(serializer.data)
 
-    # Likes
+    # --- Likes ---
     @action(detail=True, methods=["post"])
     def like(self, request, pk=None):
         sound = self.get_object()
@@ -60,7 +60,7 @@ class SoundViewSet(
         sound.likes.remove(request.user)
         return Response({"detail": f"Unliked {sound.name}"}, status=status.HTTP_200_OK)
 
-    # Saves
+    # --- Saves ---
     @action(detail=True, methods=["post"])
     def save(self, request, pk=None):
         sound = self.get_object()
@@ -79,9 +79,7 @@ class SoundViewSet(
         return Response({"detail": f"Removed {sound.name}."}, status=status.HTTP_200_OK)
 
 
-# --- File Actions ---
-
-
+# -- SOUND FILES --
 @api_view(["POST"])
 def download(request):
     serializer = DownloadSerializer(data=request.data)

@@ -1,7 +1,9 @@
+# -- IMPORTS --
 import os
 from yt_dlp import YoutubeDL
 
 
+# -- HELPERS --
 class LargeSizeError(Exception):
     def __init__(self, *args: object) -> None:
         super().__init__(*args)
@@ -22,6 +24,7 @@ def get_filesize(info: dict) -> int | None:
     return info.get("filesize") or info.get("filesize_approx")
 
 
+# -- DOWNLOADER --
 def download_and_convert(url: str, user_id: int, max_size: int = 5) -> str:
     info = get_metadata(url)
     # Could check for file existence here; ydl.prepare_filename(info).rsplit(".", 1)[0]
