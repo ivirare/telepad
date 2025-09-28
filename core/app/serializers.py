@@ -15,13 +15,21 @@ class SoundSerializer(TaggitSerializer, serializers.ModelSerializer):
             "id",
             "owner",
             "name",
-            "file",
+            "file_id",
+            "duration",
             "tags",
             "likes_count",
             "is_saved",
             "is_private",
         )
-        read_only_fields = ["id", "owner", "file", "likes_count", "is_saved"]
+        read_only_fields = [
+            "id",
+            "owner",
+            "file_id",
+            "duration",
+            "likes_count",
+            "is_saved",
+        ]
 
 
 class DownloadSerializer(serializers.Serializer):

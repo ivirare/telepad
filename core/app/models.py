@@ -10,7 +10,8 @@ class Sound(models.Model):
         related_name="sounds",
     )
     name = models.CharField(max_length=255)
-    file = models.FileField()
+    file_id = models.CharField()
+    duration = models.IntegerField()
     tags = TaggableManager(blank=True)
     likes = models.ManyToManyField(
         User,
