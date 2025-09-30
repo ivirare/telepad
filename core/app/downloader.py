@@ -34,7 +34,7 @@ def get_filesize(info: dict) -> int | None:
 
 
 # -- DOWNLOADER --
-def download_and_convert(url: str, user_tg_id: int) -> str:
+def download_and_convert(url: str, user_id: int) -> str:
     info = get_metadata(url)
     filesize = get_filesize(info)
     if filesize and (filesize / 1024 / 1024) > MAX_FILESIZE_MB:
@@ -43,7 +43,7 @@ def download_and_convert(url: str, user_tg_id: int) -> str:
         "format": "bestaudio",
         "max-filesize": f"{MAX_FILESIZE_MB*2}M",
         "restrictfilenames": True,
-        "outtmpl": os.path.join(MEDIA_ROOT, f"temp_{user_tg_id}_%(title)s.%(ext)s"),
+        "outtmpl": os.path.join(MEDIA_ROOT, f"temp_{user_id}_%(title)s.%(ext)s"),
         "quiet": True,
         "noplaylist": True,
     }

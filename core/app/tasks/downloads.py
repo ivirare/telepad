@@ -16,7 +16,7 @@ def download_sound(user_id: int, url: str):
         file_id = upload_to_telegram("/media/" + path, title, duration)
 
         sound = Sound.objects.create(
-            owner=user_id,
+            owner_id=user_id,
             name=title,
             file_id=file_id,
             duration=duration,

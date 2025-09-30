@@ -23,8 +23,8 @@ class Sound(models.Model):
         related_name="saved_sounds",
         blank=True,
     )
-    created_at = models.DateTimeField(auto_now_add=True)
     is_private = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.id} {self.name}"

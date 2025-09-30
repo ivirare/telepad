@@ -5,7 +5,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import viewsets, permissions, status, mixins
 from rest_framework.decorators import action, api_view, parser_classes
 
-from django.db.models import Count, Exists, OuterRef
+from django.db.models import Count, Exists, Q, OuterRef
 from django.core.files.storage import default_storage
 
 from .models import Sound
@@ -35,13 +35,12 @@ class SoundViewSet(
     # --- Quering Methods ---
     def get_queryset(self):
         user = self.request.user
-        qs = None
+        qs = Sound.objects.filter(is_active=True).annotate(likes_count=Count("likes"))
 
         if self.action == "list":
-            qs = Sound.objects.filter(owner=user).annotate(likes_count=Count("likes"))
+            qs = qs.filter(saves=user)
         else:
-            qs = Sound.objects.filter(is_private=False).annotate(
-                likes_count=Count("likes"),
+            qs = qs.filter(Q(owner=user) | Q(is_private=False)).annotate(
                 is_saved=Exists(user.saved_sounds.filter(pk=OuterRef("pk"))),
             )
 
@@ -51,8 +50,8 @@ class SoundViewSet(
     def get_serializer_context(self):
         return {"request": self.request}
 
-    @action(detail=False, methods=["get"], url_path="all")
-    def list_all(self, request):
+    @action(detail=False, methods=["get"], url_path="search")
+    def search_all(self, request):
         qs = self.get_queryset()
         page = self.paginate_queryset(qs)
         serializer = self.get_serializer(page, many=True)
@@ -63,31 +62,42 @@ class SoundViewSet(
     def like(self, request, pk=None):
         sound = self.get_object()
         sound.likes.add(request.user)
-        return Response({"detail": f"Liked {sound.name}"}, status=status.HTTP_200_OK)
+        return Response(
+            {"method": "Like", "sound_name": sound.name}, status=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=["post"])
     def unlike(self, request, pk=None):
         sound = self.get_object()
         sound.likes.remove(request.user)
-        return Response({"detail": f"Unliked {sound.name}"}, status=status.HTTP_200_OK)
+        return Response(
+            {"method": "Unlike", "sound_name": sound.name}, status=status.HTTP_200_OK
+        )
 
     # --- Saves ---
     @action(detail=True, methods=["post"])
     def save(self, request, pk=None):
         sound = self.get_object()
-        if sound.owner == request.user:
-            return Response(
-                {"detail": "You cannot save your own sound."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
         sound.saves.add(request.user)
-        return Response({"detail": f"Saved {sound.name}."}, status=status.HTTP_200_OK)
+        return Response(
+            {"method": "Save", "sound_name": sound.name}, status=status.HTTP_200_OK
+        )
 
     @action(detail=True, methods=["post"])
     def unsave(self, request, pk=None):
         sound = self.get_object()
         sound.saves.remove(request.user)
-        return Response({"detail": f"Removed {sound.name}."}, status=status.HTTP_200_OK)
+        method = "Unsave"
+
+        if not sound.saves.exists():
+            sound.is_active = False
+            sound.save(update_fields=["is_active"])
+            method = "Delete"
+
+        return Response(
+            {"method": method, "sound_name": sound.name},
+            status=status.HTTP_200_OK,
+        )
 
 
 # -- SOUND FILES --
@@ -100,7 +110,7 @@ def download(request):
     task = download_sound.delay(request.user.id, url)
 
     return Response(
-        {"detail": "Download task started.", "task_id": task.id},
+        {"method": "Download", "detail": "Task started", "task_id": task.id},
         status=status.HTTP_202_ACCEPTED,
     )
 
@@ -116,13 +126,13 @@ def upload(request):
         path = default_storage.save(validated_file.name, validated_file)
     except Exception as error:
         return Response(
-            {"detail": f"Error saving file: {error}"},
+            {"method": "Upload", "detail": f"Error saving file: {error}"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
     task = upload_sound.delay(request.user.id, path, validated_file.name)
 
     return Response(
-        {"detail": "Upload task started.", "task_id": task.id},
+        {"method": "Upload", "detail": "Task started", "task_id": task.id},
         status=status.HTTP_202_ACCEPTED,
     )
