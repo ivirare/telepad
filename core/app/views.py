@@ -65,8 +65,8 @@ class SoundViewSet(
     def get_serializer_context(self):
         return {"request": self.request}
 
-    @action(detail=False, methods=["get"], url_path="search")
-    def search_all(self, request):
+    @action(detail=False, methods=["get"], url_path="all")
+    def list_all(self, request):
         qs = self.get_queryset()
         page = self.paginate_queryset(qs)
         serializer = self.get_serializer(page, many=True)
