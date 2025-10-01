@@ -34,17 +34,24 @@ class SoundViewSet(
     pagination_class = Pagination
     permission_classes = (permissions.IsAuthenticated, SoundPermission)
 
-    # --- Quering Methods ---
+    # --- Queryset constructor ---
     def get_queryset(self):
         user = self.request.user
         qs = Sound.objects.filter(is_active=True).annotate(likes_count=Count("likes"))
 
+        # Tags
         tag_names = self.request.query_params.getlist("tags")
         if tag_names:
             for tag in tag_names:
                 qs = qs.filter(tags__name=tag)
             qs = qs.distinct()
 
+        # Searching
+        search = self.request.query_params.get("search")
+        if search:
+            qs = qs.filter(name__icontains=search)
+
+        # Access
         if self.action == "list":
             qs = qs.filter(saves=user)
         else:
