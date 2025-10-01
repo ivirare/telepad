@@ -1,4 +1,5 @@
 # -- IMPORTS --
+import os
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -12,6 +13,7 @@ from .models import Sound
 from .serializers import SoundSerializer, DownloadSerializer, UploadSerializer
 from .permissions import SoundPermission
 from .tasks.downloads import download_sound, upload_sound
+from telepad.settings import MEDIA_ROOT
 
 
 # -- PAGINATION --
@@ -36,6 +38,12 @@ class SoundViewSet(
     def get_queryset(self):
         user = self.request.user
         qs = Sound.objects.filter(is_active=True).annotate(likes_count=Count("likes"))
+
+        tag_names = self.request.query_params.getlist("tags")
+        if tag_names:
+            for tag in tag_names:
+                qs = qs.filter(tags__name=tag)
+            qs = qs.distinct()
 
         if self.action == "list":
             qs = qs.filter(saves=user)
@@ -123,7 +131,8 @@ def upload(request):
     validated_file = serializer.validated_data["file"]
 
     try:
-        temp_file = default_storage.save(validated_file.name, validated_file)
+        temp_name = default_storage.save(validated_file.name, validated_file)
+        temp_file = os.path.join(MEDIA_ROOT, temp_name)
     except Exception as error:
         return Response(
             {"method": "Upload", "detail": f"Error saving file: {error}"},

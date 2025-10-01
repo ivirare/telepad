@@ -60,7 +60,7 @@ def ydl_download(url: str, user_id: int) -> str:
         "format": "bestaudio",
         "max-filesize": f"{MAX_FILESIZE_MB * 2}M",
         "restrictfilenames": True,
-        "outtmpl": os.path.join(MEDIA_ROOT, f"temp_{user_id}_%(title)s.%(ext)s"),
+        "outtmpl": os.path.join(MEDIA_ROOT, f"temp/{user_id}_%(title)s.%(ext)s"),
         "quiet": True,
         "noplaylist": True,
     }
