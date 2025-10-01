@@ -8,7 +8,6 @@ wheels/
 .python-version
 
 # Django
-migrations/
 static/
 
 # Virtual environments
