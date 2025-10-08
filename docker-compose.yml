@@ -4,9 +4,13 @@ services:
     env_file: .env
     volumes:
       - db_data:/var/lib/postgresql/data
+    networks:
+      - default_network
 
   redis:
     image: redis:8.2
+    networks:
+      - default_network
 
   web:
     build: .
@@ -19,6 +23,8 @@ services:
     depends_on:
       - db
       - redis
+    networks:
+      - default_network
        
   nginx:
     image: nginx:1.29-alpine
@@ -26,10 +32,10 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./media:/media
       - ./static:/static
-    ports:
-      - "80:80"
     depends_on:
       - web
+    networks:
+      - default_network
 
   celery:
     build: .
@@ -42,6 +48,9 @@ services:
       - db
       - redis
       - web
+    networks:
+      - default_network
+
   bot:
     build: .
     command: python bot.py
@@ -52,6 +61,22 @@ services:
     depends_on:
       - redis
       - db
+    networks:
+      - default_network
 
+  cloudflared:
+    image: cloudflare/cloudflared:2025.9.1
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./cloudflared:/etc/cloudflared
+    depends_on:
+      - nginx
+    networks:
+      - default_network
+      
 volumes:
   db_data:
+
+networks:
+  default_network:
+    driver: bridge

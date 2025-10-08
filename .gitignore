@@ -20,3 +20,6 @@ static/
 media/
 *.log
 TODO
+
+#Cloudflared
+credentials.json
