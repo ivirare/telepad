@@ -33,10 +33,10 @@ class InlineTemplate:
 
     def inline_sound(sound: dict) -> InlineQueryResultCachedVoice:
         return InlineQueryResultCachedVoice(
-        id=str(uuid4()),
-        voice_file_id=sound["file_id"],
-        title=sound["name"],
-    )
+            id=str(uuid4()),
+            voice_file_id=sound["file_id"],
+            title=sound["name"],
+        )
 
 
 class MessageTemplate:

@@ -152,3 +152,12 @@ def upload(request):
         {"method": "Upload", "detail": "Task started", "task_id": task.id},
         status=status.HTTP_202_ACCEPTED,
     )
+
+
+# -- TAGS --
+@api_view(["GET"])
+def tags(request):
+    return Response(
+        {"tags": Tag.objects.all()},
+        status=status.HTTP_200_OK,
+    )

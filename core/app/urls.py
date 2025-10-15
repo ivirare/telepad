@@ -10,4 +10,4 @@ urlpatterns = [
     path("upload/", views.upload, name="upload"),
 ]
 
-urlpatterns += router.urls 
+urlpatterns += router.urls

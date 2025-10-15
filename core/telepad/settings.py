@@ -17,9 +17,7 @@ DEBUG = env.bool("DJANGO_DEBUG")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
 BOT_API_KEY = env("BOT_API_KEY")
 
-CSRF_TRUSTED_ORIGINS = [
-    "https://api.telepad.cc", "https://telepad.cc"
-]
+CSRF_TRUSTED_ORIGINS = ["https://api.telepad.cc", "https://telepad.cc"]
 
 # -- APPLICATIONS --
 INSTALLED_APPS = [
@@ -83,7 +81,9 @@ CACHES = {"default": env.cache("REDIS_URL", default="redis://localhost:6379/0")}
 
 # -- PASSWORDS --
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -155,5 +155,5 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_IMPORTS = [
-    'app.tasks.downloads',
+    "app.tasks.downloads",
 ]

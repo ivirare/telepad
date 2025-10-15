@@ -6,15 +6,16 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('app', '0002_trgm_idx_enable'),
+        ("app", "0002_trgm_idx_enable"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddIndex(
-            model_name='sound',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['name'], name='sound_name_idx', opclasses=['gin_trgm_ops']),
+            model_name="sound",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["name"], name="sound_name_idx", opclasses=["gin_trgm_ops"]
+            ),
         ),
     ]
