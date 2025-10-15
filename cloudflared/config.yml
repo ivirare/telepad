@@ -2,6 +2,6 @@ tunnel: 0d8cfc1f-98a5-4467-b511-38197ee0e627
 credentials-file: /etc/cloudflared/credentials.json
 
 ingress:
-  - hostname: api.telepad.cc
+  - hostname: telepad.cc
     service: http://nginx:80
   - service: http_status:404
