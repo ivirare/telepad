@@ -1,5 +1,6 @@
 # -- IMPORTS --
 import os
+from django.core.checks import Tags
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -8,9 +9,15 @@ from rest_framework.decorators import action, api_view, parser_classes
 
 from django.db.models import Count, Exists, Q, OuterRef
 from django.core.files.storage import default_storage
+from taggit.models import Tag
 
 from .models import Sound
-from .serializers import SoundSerializer, DownloadSerializer, UploadSerializer
+from .serializers import (
+    SoundSerializer,
+    DownloadSerializer,
+    UploadSerializer,
+    TagSerializer,
+)
 from .permissions import SoundPermission
 from .tasks.downloads import download_sound, upload_sound
 from telepad.settings import MEDIA_ROOT
@@ -157,7 +164,9 @@ def upload(request):
 # -- TAGS --
 @api_view(["GET"])
 def tags(request):
+    tags_queryset = Tag.objects.all()
+    serializer = TagSerializer(tags_queryset, many=True)
     return Response(
-        {"tags": Tag.objects.all()},
+        serializer.data,
         status=status.HTTP_200_OK,
     )

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from taggit.serializers import TagListSerializerField, TaggitSerializer
-
+from taggit.models import Tag
 from .models import Sound
 
 
@@ -38,3 +38,9 @@ class DownloadSerializer(serializers.Serializer):
 
 class UploadSerializer(serializers.Serializer):
     file = serializers.FileField(required=True, allow_empty_file=False)
+
+
+class TagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tag
+        fields = "name"
