@@ -19,8 +19,12 @@ const user = auth.user
 onMounted(() => {
   window.addEventListener('tg-auth', (e: any) => {
     const data = e.detail
-    // For now, send telegram_id and username only (hash later)
-    auth.login({ telegram_id: Number(data.id), username: data.username || '' })
+    const keys = ['id','username','first_name','last_name','photo_url','auth_date','hash']
+    const payload: any = {}
+    keys.forEach((k) => { if (data[k] !== undefined && data[k] !== null && data[k] !== '') payload[k] = data[k] })
+    if (payload.id) payload.id = Number(payload.id)
+    if (payload.auth_date) payload.auth_date = Number(payload.auth_date)
+    auth.login(payload)
   })
 })
 
