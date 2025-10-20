@@ -5,17 +5,17 @@
         <input v-model="url" type="url" placeholder="Paste link to download"
                class="flex-1 rounded-l-lg bg-base-700 px-3 py-2 outline-none focus:ring-1 focus:ring-accent-400" />
         <button @click="submitDownload" :disabled="!url || downloading"
-                class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4">Download</button>
+                class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4 py-2">Download</button>
       </div>
-      <div v-else class="flex w-full">
+      <div v-else class="flex w-full items-center">
         <input v-model="search" @keyup.enter="doSearch()" placeholder="Search sounds" class="flex-1 rounded-l-lg bg-base-700 px-3 py-2 outline-none focus:ring-1 focus:ring-accent-400" />
-        <button @click="doSearch()" class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4">Search</button>
+        <button @click="doSearch()" class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4 py-2">Search</button>
+        <button @click="openTagPicker" class="ml-3 px-4 py-2 rounded-lg bg-base-700 hover:bg-base-600 text-accent-300">Filter tags</button>
       </div>
     </div>
 
     <div v-if="mode==='search'" class="mb-3">
       <div class="flex items-center gap-2 flex-wrap">
-        <button @click="openTagPicker" class="px-3 py-1 rounded bg-base-700 hover:bg-base-600 text-accent-300">Filter tags</button>
         <span v-for="t in selectedTags" :key="t" class="px-2 py-0.5 rounded-full bg-base-700 text-accent-300 text-xs">#{{ t }}</span>
         <button v-if="selectedTags.length" @click="clearTags" class="text-accent-400 text-xs">Clear</button>
       </div>

@@ -24,6 +24,20 @@ try {
   }
 } catch {}
 
+window.addEventListener('tg-auth', (e: any) => {
+  try {
+    const auth = useAuth(pinia)
+    const data = e.detail || {}
+    const payload: any = {}
+    ;['id','username','first_name','last_name','photo_url','auth_date','hash'].forEach((k) => {
+      if (data[k] !== undefined && data[k] !== null && data[k] !== '') payload[k] = data[k]
+    })
+    if (payload.id) payload.id = Number(payload.id)
+    if (payload.auth_date) payload.auth_date = Number(payload.auth_date)
+    auth.login(payload)
+  } catch {}
+})
+
 app.mount('#app')
 
 

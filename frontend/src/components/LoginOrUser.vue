@@ -1,32 +1,18 @@
 <template>
   <div>
     <div v-if="isAuthed" class="flex items-center gap-3">
-      <img v-if="user?.photo_url" :src="user.photo_url" class="w-8 h-8 rounded-full object-cover" alt="pfp" />
-      <div class="text-sm">{{ user?.username || ('id ' + user?.telegram_id) }}</div>
-      <button @click="logout" class="text-accent-400 hover:text-accent-300 text-sm">Logout</button>
+      <div class="font-mono text-sm">{{ user?.username || ('id ' + user?.telegram_id) }}</div>
+      <button @click="logout" class="font-mono text-accent-400 hover:text-accent-300 text-sm">Logout</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
 import { useAuth } from '../stores/auth'
 
 const auth = useAuth()
 const isAuthed = auth.isAuthenticated
 const user = auth.user
-
-onMounted(() => {
-  window.addEventListener('tg-auth', (e: any) => {
-    const data = e.detail
-    const keys = ['id','username','first_name','last_name','photo_url','auth_date','hash']
-    const payload: any = {}
-    keys.forEach((k) => { if (data[k] !== undefined && data[k] !== null && data[k] !== '') payload[k] = data[k] })
-    if (payload.id) payload.id = Number(payload.id)
-    if (payload.auth_date) payload.auth_date = Number(payload.auth_date)
-    auth.login(payload)
-  })
-})
 
 async function logout() {
   await auth.logout()

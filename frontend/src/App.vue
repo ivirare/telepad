@@ -1,13 +1,12 @@
 <template>
   <div class="min-h-full flex flex-col">
-    <header class="px-5 py-4 flex items-center justify-between">
+    <header v-if="isAuthed" class="px-5 py-4 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="text-xl font-semibold tracking-wide">Telepad</div>
-        <div class="text-sm text-accent-400">@tlpadbot</div>
+        <div class="text-2xl font-semibold tracking-wide font-mono">Telepad</div>
+        <div class="text-sm text-accent-400 font-mono">@tlpadbot</div>
       </div>
       <LoginOrUser />
     </header>
-
     <main class="flex-1 px-4 pb-6">
       <div class="max-w-3xl mx-auto">
         <template v-if="isAuthed">
@@ -16,9 +15,9 @@
         </template>
         <template v-else>
           <div class="h-[70vh] grid place-items-center">
-            <div class="flex flex-col items-center gap-4">
-              
-              <div class="text-4xl font-semibold tracking-wide">Welcome</div>
+            <div class="flex flex-col items-center gap-6 w-full">
+              <div class="font-bold font-mono text-[10vw] leading-tight max-w-[50vw] text-center">Telepad</div>
+              <div class="text-accent-400 text-sm">The Telegram-integrated soundboard.</div>
               <TelegramLogin />
             </div>
           </div>
