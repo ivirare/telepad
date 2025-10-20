@@ -8,8 +8,16 @@
                 class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4">Download</button>
       </div>
       <div v-else class="flex w-full">
-        <input v-model="search" placeholder="Search sounds" class="flex-1 rounded-l-lg bg-base-700 px-3 py-2 outline-none focus:ring-1 focus:ring-accent-400" />
-        <button @click="doSearch" class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4">Search</button>
+        <input v-model="search" @keyup.enter="doSearch()" placeholder="Search sounds" class="flex-1 rounded-l-lg bg-base-700 px-3 py-2 outline-none focus:ring-1 focus:ring-accent-400" />
+        <button @click="doSearch()" class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4">Search</button>
+      </div>
+    </div>
+
+    <div v-if="mode==='search'" class="mb-3">
+      <div class="flex items-center gap-2 flex-wrap">
+        <button @click="openTagPicker" class="px-3 py-1 rounded bg-base-700 hover:bg-base-600 text-accent-300">Filter tags</button>
+        <span v-for="t in selectedTags" :key="t" class="px-2 py-0.5 rounded-full bg-base-700 text-accent-300 text-xs">#{{ t }}</span>
+        <button v-if="selectedTags.length" @click="clearTags" class="text-accent-400 text-xs">Clear</button>
       </div>
     </div>
 
@@ -23,6 +31,7 @@
       <div v-if="!sounds.length" class="text-center text-accent-400 py-12">No results</div>
     </div>
   </div>
+  <TagPicker :open="tagPickerOpen" :initialSelected="selectedTags" @apply="applyTags" @close="tagPickerOpen=false" />
 </template>
 
 <script setup lang="ts">
@@ -30,6 +39,7 @@ import { onMounted, ref, watch } from 'vue'
 import axios from 'axios'
 import SoundList from './SoundList.vue'
 import TaskPlaceholders from './TaskPlaceholders.vue'
+import TagPicker from './TagPicker.vue'
 
 const props = defineProps<{ mode: 'library' | 'search' }>()
 
@@ -39,6 +49,8 @@ const sounds = ref<any[]>([])
 const nextPage = ref<string | null>(null)
 const downloading = ref(false)
 const tasks = ref<{ id: string; state: string }[]>(JSON.parse(localStorage.getItem('dl_tasks') || '[]'))
+const selectedTags = ref<string[]>([])
+const tagPickerOpen = ref(false)
 
 async function submitDownload() {
   if (!url.value) return
@@ -84,8 +96,19 @@ async function refresh() {
   }
 }
 
+function buildQuery(base: string) {
+  const usp = new URLSearchParams()
+  if (search.value) usp.set('search', search.value)
+  selectedTags.value.forEach((t) => usp.append('tags', t))
+  return `${base}?${usp.toString()}`
+}
+
+function normalizeUrl(u: string) {
+  try { const a = new URL(u); return a.pathname + a.search } catch { return u }
+}
+
 async function doSearch(urlOverride?: string) {
-  const endpoint = urlOverride || `/api/sounds/all/?search=${encodeURIComponent(search.value)}`
+  const endpoint = urlOverride ? normalizeUrl(urlOverride) : buildQuery('/api/sounds/all/')
   const resp = await axios.get(endpoint)
   sounds.value = resp.data?.results || []
   nextPage.value = resp.data?.next || null
@@ -93,7 +116,7 @@ async function doSearch(urlOverride?: string) {
 
 async function loadMore() {
   if (!nextPage.value) return
-  const resp = await axios.get(nextPage.value)
+  const resp = await axios.get(normalizeUrl(nextPage.value))
   sounds.value.push(...(resp.data?.results || []))
   nextPage.value = resp.data?.next || null
 }
@@ -108,6 +131,10 @@ onMounted(async () => {
   // resume polling for existing pending tasks
   tasks.value.filter(t => !['SUCCESS','FAILURE'].includes(t.state)).forEach(t => pollTask(t.id))
 })
+
+function openTagPicker() { tagPickerOpen.value = true }
+function applyTags(tags: string[]) { selectedTags.value = tags; doSearch() }
+function clearTags() { selectedTags.value = []; doSearch() }
 </script>
 
 

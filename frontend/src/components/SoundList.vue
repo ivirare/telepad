@@ -8,10 +8,16 @@
       <div class="flex-1 min-w-0">
         <div v-if="editingId!==s.id" class="truncate">{{ s.name }}</div>
         <input v-else v-model="editName" class="w-full bg-base-600 rounded px-2 py-1" />
-        <div class="text-xs text-accent-400">
-          <span>{{ durationLabel(s) }}</span>
-          <span v-if="s.tags?.length"> • {{ s.tags.join(', ') }}</span>
+        <div class="mt-1 flex flex-wrap gap-1">
+          <template v-if="editingId!==s.id">
+            <span v-for="t in (s.tags||[])" :key="t" class="px-2 py-0.5 rounded-full bg-base-600 text-accent-300 text-sm">#{{ t }}</span>
+          </template>
+          <template v-else>
+            <button @click="openTags(s)" class="px-2 py-0.5 rounded-full bg-base-600 text-accent-300 text-sm">Edit tags</button>
+            <span v-for="t in (pendingTags)" :key="t" class="px-2 py-0.5 rounded-full bg-base-600 text-accent-300 text-sm">#{{ t }}</span>
+          </template>
         </div>
+        <div class="text-xs text-accent-400">{{ durationLabel(s) }}</div>
       </div>
       <div class="flex items-center gap-2">
         <template v-if="mode==='library' && editingId!==s.id">
@@ -32,11 +38,13 @@
       <button @click="$emit('loadMore')" class="px-4 py-2 rounded-lg bg-base-600 hover:bg-base-500">Load more</button>
     </div>
   </div>
+  <TagPicker :open="tagPickerOpen" :initialSelected="pendingTags" @apply="applyTags" @close="tagPickerOpen=false" />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import axios from 'axios'
+import TagPicker from './TagPicker.vue'
 
 const props = defineProps<{ sounds: any[]; mode: 'library' | 'search'; hasMore?: boolean }>()
 const emit = defineEmits(['refresh', 'loadMore'])
@@ -69,17 +77,21 @@ function durationLabel(s: any) {
 
 const editingId = ref<number | null>(null)
 const editName = ref('')
+const pendingTags = ref<string[]>([])
+const tagPickerOpen = ref(false)
 
 function startEdit(s: any) {
   editingId.value = s.id
   editName.value = s.name
+  pendingTags.value = [...(s.tags || [])]
 }
 function cancelEdit() {
   editingId.value = null
   editName.value = ''
+  pendingTags.value = []
 }
 async function applyEdit(s: any) {
-  await axios.patch(`/api/sounds/${s.id}/`, { name: editName.value })
+  await axios.patch(`/api/sounds/${s.id}/`, { name: editName.value, tags: pendingTags.value })
   editingId.value = null
   await emit('refresh')
 }
@@ -100,6 +112,12 @@ async function saveUnsave(s: any) {
   await axios.post(`/api/sounds/${s.id}/${path}/`)
   await emit('refresh')
 }
+
+function openTags(s: any) { tagPickerOpen.value = true }
+function applyTags(newTags: string[]) { pendingTags.value = newTags }
 </script>
+
+<style scoped>
+</style>
 
 

@@ -30,6 +30,11 @@ class Pagination(PageNumberPagination):
     page_size = 20
     page_size_query_param = "page_size"
     max_page_size = 100
+# -- TAG PAGINATION --
+class TagPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = None
+    max_page_size = 10
 
 
 # -- SOUNDS MODEL --
@@ -65,7 +70,7 @@ class SoundViewSet(
         # Searching
         search = self.request.query_params.get("search")
         if search:
-            qs = qs.filter(name__icontains=search)
+            qs = qs.filter(name__icontains=search.strip())
 
         # Access
         if self.action == "list":
@@ -171,12 +176,15 @@ def upload(request):
 # -- TAGS --
 @api_view(["GET"])
 def tags(request):
-    tags_queryset = Tag.objects.all()
-    serializer = TagSerializer(tags_queryset, many=True)
-    return Response(
-        serializer.data,
-        status=status.HTTP_200_OK,
-    )
+    qs = Tag.objects.all()
+    search = request.query_params.get("search")
+    if search:
+        qs = qs.filter(name__icontains=search)
+
+    paginator = TagPagination()
+    page = paginator.paginate_queryset(qs.order_by("name"), request)
+    serializer = TagSerializer(page, many=True)
+    return paginator.get_paginated_response(serializer.data)
 
 
 # -- TASKS STATUS --

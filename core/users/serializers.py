@@ -8,9 +8,9 @@ import hashlib
 
 class TelegramAuthSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
-    username = serializers.CharField(required=False, allow_blank=True)
     first_name = serializers.CharField(required=False, allow_blank=True)
     last_name = serializers.CharField(required=False, allow_blank=True)
+    username = serializers.CharField(required=False, allow_blank=True)
     photo_url = serializers.CharField(required=False, allow_blank=True)
     auth_date = serializers.IntegerField(required=False)
     hash = serializers.CharField(required=True)
