@@ -7,13 +7,13 @@
       </button>
       <div class="flex-1 min-w-0">
         <div v-if="editingId!==s.id" class="truncate">{{ s.name }}</div>
-        <input v-else v-model="editName" class="w-full bg-base-600 rounded px-2 py-1" />
+        <input v-else v-model="editName" class="w-full bg-base-600 rounded-lg px-2 py-1" />
         <div class="mt-1 flex flex-wrap gap-1">
           <template v-if="editingId!==s.id">
             <span v-for="t in (s.tags||[])" :key="t" class="px-2 py-0.5 rounded-full bg-base-600 text-accent-300 text-sm">#{{ t }}</span>
           </template>
           <template v-else>
-            <button @click="openTags(s)" class="px-2 py-0.5 rounded-full bg-base-600 text-accent-300 text-sm">Edit tags</button>
+            <button @click="openTags(s)" class="px-2 py-0.5 rounded-md bg-base-600 text-accent-300 text-sm">Edit Tags</button>
             <span v-for="t in (pendingTags)" :key="t" class="px-2 py-0.5 rounded-full bg-base-600 text-accent-300 text-sm">#{{ t }}</span>
           </template>
         </div>

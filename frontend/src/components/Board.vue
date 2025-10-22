@@ -10,7 +10,7 @@
       <div v-else class="flex w-full items-center">
         <input v-model="search" @keyup.enter="doSearch()" placeholder="Search sounds" class="flex-1 rounded-l-lg bg-base-700 px-3 py-2 outline-none focus:ring-1 focus:ring-accent-400" />
         <button @click="doSearch()" class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4 py-2">Search</button>
-        <button @click="openTagPicker" class="ml-3 px-4 py-2 rounded-lg bg-base-700 hover:bg-base-600 text-accent-300">Filter tags</button>
+        <button @click="openTagPicker" class="ml-3 px-4 py-2 rounded-lg bg-base-700 hover:bg-base-600 text-accent-300">Filter</button>
       </div>
     </div>
 

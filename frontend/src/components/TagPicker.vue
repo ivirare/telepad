@@ -1,23 +1,23 @@
 <template>
   <div v-if="open" class="fixed inset-0 z-50 grid place-items-center bg-black/50" @click.self="close">
-    <div class="w-[min(92vw,680px)] rounded-xl bg-base-800 p-5 shadow-innerdeep">
+    <div class="w-[min(92vw,380px)] rounded-xl bg-base-800 p-5 shadow-2xl">
       <div class="mb-4 text-accent-300 text-lg">Tags</div>
       <div class="flex gap-2 mb-4">
-        <input v-model="query" @keyup.enter="resetAndSearch" placeholder="Search tags" class="flex-1 bg-base-700 rounded px-4 py-3 outline-none focus:ring-1 focus:ring-accent-400 text-base" />
-        <button @click="resetAndSearch" class="px-4 py-3 rounded bg-base-600 hover:bg-base-500 text-base">Search</button>
+        <input v-model="query" @keyup.enter="resetAndSearch" placeholder="Add or create tags..." class="flex-1 bg-base-700 rounded-lg px-4 py-3 outline-none focus:ring-1 focus:ring-accent-400 text-base" />
+        <button @click="resetAndSearch" class="px-4 py-3 rounded-lg bg-base-600 hover:bg-base-500 text-base">Search</button>
       </div>
       <div ref="scrollBox" class="min-h-28 max-h-80 overflow-auto pr-1 space-y-1">
         <div v-if="!loading && results.length===0" class="text-accent-400 text-sm">
           No tags. <button @click="createTag" class="underline">Create tag</button>
         </div>
-        <div v-for="t in results" :key="t" class="flex items-center justify-between bg-base-700 rounded px-3 py-2">
+        <div v-for="t in results" :key="t" class="flex items-center justify-between bg-base-700 rounded-lg px-3 py-2">
           <div class="text-accent-300 text-base">#{{ t }}</div>
           <input type="checkbox" class="scale-110" :checked="selectedSet.has(t)" @change="toggle(t)" />
         </div>
       </div>
       <div class="mt-5 flex justify-end gap-3">
-        <button @click="apply" class="px-4 py-2 rounded bg-base-600 hover:bg-base-500 text-base">Add</button>
-        <button @click="close" class="px-4 py-2 rounded bg-base-600 hover:bg-base-500 text-base">Cancel</button>
+        <button @click="apply" class="px-4 py-2 rounded-lg bg-base-600 hover:bg-base-500 text-base">Add</button>
+        <button @click="close" class="px-4 py-2 rounded-lg bg-base-600 hover:bg-base-500 text-base">Cancel</button>
       </div>
     </div>
   </div>
