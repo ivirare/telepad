@@ -35,6 +35,13 @@ class SoundSerializer(TaggitSerializer, serializers.ModelSerializer):
             "is_saved",
         ]
 
+    def validate_tags(self, value):
+        if value is None:
+            return value
+        if len(value) > 10:
+            raise serializers.ValidationError("Sound cant contain more than 10 tags.")
+        return value
+
 
 class DownloadSerializer(serializers.Serializer):
     url = serializers.URLField(max_length=2048, required=True)
