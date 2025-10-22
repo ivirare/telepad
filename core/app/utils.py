@@ -45,7 +45,7 @@ def ffprobe_get_duration(filepath: str):
 
     output = subprocess.run(command, check=True, capture_output=True, text=True)
     duration = int(float(output.stdout.strip()))
-
+    
     return duration
 
 

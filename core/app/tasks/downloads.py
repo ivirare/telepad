@@ -14,7 +14,7 @@ def download_sound(user_id: int, url: str):
     try:
         temp_file, info = ydl_download(url, user_id)
         title = info.get("title")
-        duration = info.get("duration")
+        duration = info.get("duration") or ffprobe_get_duration(temp_file)
 
         name = f"{os.path.splitext(os.path.basename(temp_file))[0]}.ogg"
         output_file = os.path.join(MEDIA_ROOT, name)
