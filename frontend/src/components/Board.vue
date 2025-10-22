@@ -1,16 +1,20 @@
 <template>
   <div class="mt-4 rounded-xl bg-base-800 shadow-innerdeep p-4">
     <div class="flex items-center gap-3 mb-4">
-      <div v-if="mode==='library'" class="flex w-full">
-        <input v-model="url" type="url" placeholder="Paste link to download"
-               class="flex-1 rounded-l-lg bg-base-700 px-3 py-2 outline-none focus:ring-1 focus:ring-accent-400" />
-        <button @click="submitDownload" :disabled="!url || downloading"
-                class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4 py-2">Download</button>
+      <div v-if="mode==='library'" class="flex w-full items-center flex-wrap gap-x-2 gap-y-2">
+        <div class="flex items-center flex-1 min-w-0">
+          <input v-model="url" type="url" placeholder="Paste link to download"
+                 class="min-w-0 flex-1 rounded-l-lg bg-base-700 px-3 py-2 outline-none focus:ring-1 focus:ring-accent-400" />
+          <button @click="submitDownload" :disabled="!url || downloading"
+                  class="shrink-0 rounded-r-lg bg-base-600 hover:bg-base-500 px-4 py-2">Download</button>
+        </div>
       </div>
-      <div v-else class="flex w-full items-center">
-        <input v-model="search" @keyup.enter="doSearch()" placeholder="Search sounds" class="flex-1 rounded-l-lg bg-base-700 px-3 py-2 outline-none focus:ring-1 focus:ring-accent-400" />
-        <button @click="doSearch()" class="rounded-r-lg bg-base-600 hover:bg-base-500 px-4 py-2">Search</button>
-        <button @click="openTagPicker" class="ml-3 px-4 py-2 rounded-lg bg-base-700 hover:bg-base-600 text-accent-300">Filter</button>
+      <div v-else class="flex w-full items-center flex-wrap gap-x-2 gap-y-2">
+        <div class="flex items-center flex-1 min-w-0">
+          <input v-model="search" @keyup.enter="doSearch()" placeholder="Search sounds" class="min-w-0 flex-1 rounded-l-lg bg-base-700 px-3 py-2 outline-none focus:ring-1 focus:ring-accent-400" />
+          <button @click="doSearch()" class="shrink-0 rounded-r-lg bg-base-600 hover:bg-base-500 px-4 py-2">Search</button>
+        </div>
+        <button @click="openTagPicker" class="shrink-0 w-auto px-4 py-2 rounded-lg bg-base-700 hover:bg-base-600 text-accent-300">Filter</button>
       </div>
     </div>
 

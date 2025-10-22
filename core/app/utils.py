@@ -59,7 +59,6 @@ def ydl_download(url: str, user_id: int) -> str:
     ydl_opts = {
         "format": "bestaudio/bestvideo/best",
         "max-filesize": f"{MAX_FILESIZE_MB * 2}M",
-        "restrictfilenames": True,
         "outtmpl": os.path.join(MEDIA_ROOT, f"temp/{user_id}_%(title)s.%(ext)s"),
         "quiet": True,
         "noplaylist": True,
@@ -120,5 +119,5 @@ def convert(input_file: str, output_file: str):
 
     subprocess.run(command, check=True, capture_output=True, text=True)
 
-    if input_file and os.path.exists(input_file):
-        os.remove(input_file)
+    # if input_file and os.path.exists(input_file):
+    #     os.remove(input_file)
