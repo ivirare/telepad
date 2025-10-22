@@ -9,6 +9,7 @@ from rest_framework.decorators import action, api_view, parser_classes
 
 from django.db.models import Count, Exists, Q, OuterRef
 from django.core.files.storage import default_storage
+import random
 from taggit.models import Tag
 
 from .models import Sound
@@ -180,9 +181,11 @@ def upload(request):
     serializer = UploadSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     validated_file = serializer.validated_data["file"]
+    base, ext = os.path.splitext(os.path.basename(validated_file.name))
+    filename = f"{request.user.id}_{base}_{random.randint(1000, 9999)}{ext}"
 
     try:
-        temp_name = default_storage.save(validated_file.name, validated_file)
+        temp_name = default_storage.save(f"temp/{filename}", validated_file)
         temp_file = os.path.join(MEDIA_ROOT, temp_name)
     except Exception as error:
         return Response(
@@ -190,7 +193,7 @@ def upload(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
-    task = upload_sound.delay(request.user.id, temp_file, validated_file.name)
+    task = upload_sound.delay(request.user.id, temp_file, filename)
 
     return Response(
         {"method": "Upload", "detail": "Task started", "task_id": task.id},

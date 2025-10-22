@@ -1,5 +1,6 @@
 # -- IMPORTS --
 import os
+import random
 import requests
 import subprocess
 from yt_dlp import YoutubeDL
@@ -58,8 +59,8 @@ def ydl_download(url: str, user_id: int) -> str:
 
     ydl_opts = {
         "format": "bestaudio/bestvideo/best",
-        "max-filesize": f"{MAX_FILESIZE_MB * 2}M",
-        "outtmpl": os.path.join(MEDIA_ROOT, f"temp/{user_id}_%(title)s.%(ext)s"),
+        "max-filesize": f"{MAX_FILESIZE_MB}M",
+        "outtmpl": os.path.join(MEDIA_ROOT, f"temp/{user_id}_%(title)s_{random.randint(1000, 9999)}.%(ext)s"),
         "quiet": True,
         "noplaylist": True,
     }
@@ -81,9 +82,6 @@ def upload_to_telegram(path: str, title: str, duration: int) -> str | None:
         }
         response = requests.post(API_URL, data=data, files=files, timeout=60)
         response.raise_for_status()
-
-    # if path and os.path.exists(path):
-    #     os.remove(path)
 
     response = response.json()
     if response.get("ok"):
@@ -119,5 +117,5 @@ def convert(input_file: str, output_file: str):
 
     subprocess.run(command, check=True, capture_output=True, text=True)
 
-    # if input_file and os.path.exists(input_file):
-    #     os.remove(input_file)
+    if input_file and os.path.exists(input_file):
+        os.remove(input_file)

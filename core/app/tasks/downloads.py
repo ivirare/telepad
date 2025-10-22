@@ -47,7 +47,7 @@ def download_sound(user_id: int, url: str):
 
 @shared_task
 def upload_sound(user_id: int, temp_file: str, filename: str):
-    basename, _ = os.path.splitext(filename)
+    basename, _ = os.path.splitext(os.path.basename(filename))
     output_file = os.path.join(MEDIA_ROOT, f"{basename}.ogg")
     duration = ffprobe_get_duration(temp_file)
 
@@ -58,6 +58,7 @@ def upload_sound(user_id: int, temp_file: str, filename: str):
         sound = Sound.objects.create(
             owner_id=user_id,
             name=basename,
+            file_path=os.path.basename(output_file),
             file_id=file_id,
             duration=duration,
             is_private=True,

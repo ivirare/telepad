@@ -1,5 +1,6 @@
 <template>
-  <div class="mt-4 rounded-xl bg-base-800 shadow-innerdeep p-4">
+  <div class="mt-4 rounded-xl bg-base-800 shadow-innerdeep p-4 relative"
+       @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="onDrop">
     <div class="flex items-center gap-3 mb-4">
       <div v-if="mode==='library'" class="flex w-full items-center flex-wrap gap-x-2 gap-y-2">
         <div class="flex items-center flex-1 min-w-0">
@@ -8,6 +9,8 @@
           <button @click="submitDownload" :disabled="!url || downloading"
                   class="shrink-0 rounded-r-lg bg-base-600 hover:bg-base-500 px-4 py-2">Download</button>
         </div>
+        <button @click="triggerFilePicker" class="shrink-0 w-auto px-4 py-2 rounded-lg bg-base-700 hover:bg-base-600 text-accent-300">Upload</button>
+        <input ref="fileInput" type="file" class="hidden" accept="audio/*,video/*" @change="onFilePicked" />
       </div>
       <div v-else class="flex w-full items-center flex-wrap gap-x-2 gap-y-2">
         <div class="flex items-center flex-1 min-w-0">
@@ -34,6 +37,24 @@
       <SoundList :mode="mode" :sounds="sounds" @loadMore="loadMore" @refresh="refresh" />
       <div v-if="!sounds.length" class="text-center text-accent-400 py-12">No results</div>
     </div>
+    <!-- Drag overlay -->
+    <div v-show="isDragging" class="absolute inset-0 bg-black/40 rounded-xl grid place-items-center pointer-events-none">
+      <div class="flex flex-col items-center gap-3 text-accent-300">
+        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+        <div class="text-sm">Drop to upload</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div v-if="toastMessage" class="fixed inset-x-0 bottom-24 flex justify-center z-[60] pointer-events-none">
+    <div class="pointer-events-auto bg-base-700/90 text-accent-300 rounded-lg shadow-2xl px-4 py-2">
+      {{ toastMessage }}
+    </div>
   </div>
   <TagPicker :open="tagPickerOpen" :initialSelected="selectedTags" @apply="applyTags" @close="tagPickerOpen=false" />
 </template>
@@ -55,6 +76,76 @@ const downloading = ref(false)
 const tasks = ref<{ id: string; state: string }[]>(JSON.parse(localStorage.getItem('dl_tasks') || '[]'))
 const selectedTags = ref<string[]>([])
 const tagPickerOpen = ref(false)
+const fileInput = ref<HTMLInputElement | null>(null)
+const isDragging = ref(false)
+const dragCounter = ref(0)
+const toastMessage = ref('')
+let toastTimer: any = null
+
+function triggerFilePicker() {
+  fileInput.value?.click()
+}
+
+function showToast(msg: string, ms = 2500) {
+  toastMessage.value = msg
+  if (toastTimer) clearTimeout(toastTimer)
+  toastTimer = setTimeout(() => (toastMessage.value = ''), ms)
+}
+
+function onDragEnter() { dragCounter.value++; isDragging.value = true }
+function onDragOver() { isDragging.value = true }
+function onDragLeave() { dragCounter.value--; if (dragCounter.value <= 0) { isDragging.value = false; dragCounter.value = 0 } }
+async function onDrop(e: DragEvent) {
+  dragCounter.value = 0
+  isDragging.value = false
+  const files = e.dataTransfer?.files
+  if (!files || !files.length) return
+  await handleFiles(files)
+}
+
+async function onFilePicked(ev: Event) {
+  const input = ev.target as HTMLInputElement
+  if (!input.files || !input.files.length) return
+  await handleFiles(input.files)
+  input.value = ''
+}
+
+async function handleFiles(fileList: FileList) {
+  const file = fileList[0]
+  if (!file) return
+  // Validate playable types
+  const mime = (file.type || '').toLowerCase()
+  const name = (file.name || '').toLowerCase()
+  const playableMime = mime.startsWith('audio/') || mime.startsWith('video/')
+  const allowedExt = [
+    '.mp3','.wav','.ogg','.oga','.opus','.m4a','.aac','.flac','.alac','.wma','.amr',
+    '.mp4','.m4v','.webm','.mkv','.mov','.avi'
+  ]
+  const hasAllowedExt = allowedExt.some(ext => name.endsWith(ext))
+  if (!(playableMime || hasAllowedExt)) {
+    showToast('Unsupported file type. Please choose an audio or video file.')
+    return
+  }
+  const maxMb = 20
+  const sizeMb = file.size / 1024 / 1024
+  if (sizeMb > maxMb) {
+    showToast(`File exceeds the maximum size of ${maxMb}MB.`)
+    return
+  }
+  try {
+    const form = new FormData()
+    form.append('file', file)
+    const resp = await axios.post('/api/upload/', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+    const id = (resp.data as any)?.task_id
+    if (id) {
+      tasks.value.unshift({ id, state: 'PENDING' })
+      localStorage.setItem('dl_tasks', JSON.stringify(tasks.value))
+      pollTask(id)
+    }
+  } catch (err: any) {
+    showToast('Upload failed')
+  }
+}
 
 async function submitDownload() {
   if (!url.value) return
@@ -82,8 +173,19 @@ async function pollTask(id: string) {
       if (idx >= 0) tasks.value[idx].state = st
       if (st === 'SUCCESS' || st === 'FAILURE') {
         clearInterval(timer)
-        if (st === 'SUCCESS') await refresh()
-        tasks.value = tasks.value.filter(t => !(t.id === id && st === 'SUCCESS'))
+        if (st === 'SUCCESS') {
+          const result = (r.data && (r.data as any).result) || null
+          if (result && (result as any).status === 'Failed') {
+            const detail = (result as any).detail as string | undefined
+            showToast(formatTaskError(detail))
+          } else {
+            await refresh()
+          }
+        } else if (st === 'FAILURE') {
+          const statusInfo = (r.data && (r.data as any).status) || 'Task failed'
+          showToast(String(statusInfo))
+        }
+        tasks.value = tasks.value.filter(t => t.id !== id)
         localStorage.setItem('dl_tasks', JSON.stringify(tasks.value))
       }
     } catch {}
@@ -139,6 +241,15 @@ onMounted(async () => {
 function openTagPicker() { tagPickerOpen.value = true }
 function applyTags(tags: string[]) { selectedTags.value = tags; doSearch() }
 function clearTags() { selectedTags.value = []; doSearch() }
+
+function formatTaskError(detail?: string): string {
+  if (!detail) return 'Task failed'
+  const m = detail.match(/Estimated file size exceeds\s+(\d+)MB\.?/i)
+  if (m && m[1]) {
+    return `File exceeds the maximum size of ${m[1]}MB.`
+  }
+  return detail
+}
 </script>
 
 
