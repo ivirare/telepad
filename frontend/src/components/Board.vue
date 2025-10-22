@@ -21,7 +21,7 @@
       </div>
     </div>
 
-    <div v-if="mode==='library'">
+    <div v-if="mode==='library'" class="mt-3">
       <TaskPlaceholders :tasks="tasks" @refresh="refresh" />
       <SoundList :mode="mode" :sounds="sounds" @refresh="refresh" />
       <div v-if="!sounds.length && !tasks.length" class="text-center text-accent-400 py-12">No saved sounds yet</div>
