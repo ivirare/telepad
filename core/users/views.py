@@ -22,6 +22,7 @@ class LoginAPIView(generics.GenericAPIView):
                 "id": user.id,
                 "telegram_id": user.telegram_id,
                 "username": user.username,
+                "first_name": user.first_name,
             },
             "access": str(refresh.access_token),
             "refresh": str(refresh),
