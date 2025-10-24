@@ -29,7 +29,7 @@
           <div class="h-[70vh] grid place-items-center">
             <div class="flex flex-col items-center gap-6 w-full">
               <div class="font-bold font-mono text-[10vw] leading-tight max-w-[50vw] text-center">Telepad</div>
-              <div class="text-accent-400 text-sm">The Telegram-integrated soundboard.</div>
+              <div class="text-accent-400 text-sm">A Telegram-integrated soundboard.</div>
               <TelegramLogin />
             </div>
           </div>

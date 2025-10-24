@@ -8,7 +8,7 @@
         <div v-if="user?.first_name" class="px-4 py-2 truncate">{{ user?.first_name }}</div>
         <div class="px-4 py-2 truncate">{{ user?.telegram_id }}</div>
         <div class="h-px bg-base-700/60 my-1"></div>
-        <button @click="onLogout" class="w-full text-left px-4 py-2 text-sm" :style="{ color: '#ca404dcc' }">Logout</button>
+        <button @click="onLogout" class="w-full text-left px-4 py-2" :style="{ color: '#ca404dcc' }">Logout</button>
       </div>
     </div>
   </div>
