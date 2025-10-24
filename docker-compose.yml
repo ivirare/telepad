@@ -14,9 +14,9 @@ services:
 
   web:
     build: .
-    command: gunicorn -c gunicorn.conf.py telepad.wsgi:application
+    command: gunicorn -c gunicorn.conf.py core.wsgi:application
     volumes:
-      - ./core:/app
+      - ./api:/app
       - ./media:/media
       - ./static:/static
     env_file: .env
@@ -40,9 +40,9 @@ services:
 
   celery:
     build: .
-    command: celery -A telepad worker -l info
+    command: celery -A core worker -l info
     volumes:
-      - ./core:/app
+      - ./api:/app
       - ./media:/media
     env_file: .env
     depends_on:

@@ -21,8 +21,8 @@ from .serializers import (
 )
 from .permissions import SoundPermission
 from .tasks.downloads import download_sound, upload_sound
-from telepad.settings import MEDIA_ROOT
-from telepad.celery import app as celery_app
+from core.settings import MEDIA_ROOT
+from core.celery import app as celery_app
 from django.middleware.csrf import get_token
 
 

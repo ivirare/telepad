@@ -6,7 +6,7 @@ import subprocess
 from yt_dlp import YoutubeDL
 
 # -- ENV --
-from telepad.settings import MEDIA_ROOT
+from core.settings import MEDIA_ROOT
 
 MAX_FILESIZE_MB = int(os.environ["MAX_FILESIZE_MB"])
 BOT_STORAGE_ID = os.environ["BOT_STORAGE_ID"]

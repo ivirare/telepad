@@ -5,7 +5,7 @@ from celery import shared_task
 
 from app.models import Sound
 from app.utils import ydl_download, convert, upload_to_telegram, ffprobe_get_duration
-from telepad.settings import MEDIA_ROOT
+from core.settings import MEDIA_ROOT
 
 
 # -- TASKS --

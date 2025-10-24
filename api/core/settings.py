@@ -105,8 +105,8 @@ MEDIA_ROOT = "/media/"
 
 # -- OTHER --
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-WSGI_APPLICATION = "telepad.wsgi.application"
-ROOT_URLCONF = "telepad.urls"
+WSGI_APPLICATION = "core.wsgi.application"
+ROOT_URLCONF = "core.urls"
 
 CONTENT_SECURITY_POLICY = {
     "DIRECTIVES": {
