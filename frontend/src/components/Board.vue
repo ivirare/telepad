@@ -1,6 +1,5 @@
 <template>
-  <div class="mt-4 rounded-xl bg-base-800 shadow-innerdeep p-4 relative"
-       @dragenter.prevent="onDragEnter" @dragover.prevent="onDragOver" @dragleave.prevent="onDragLeave" @drop.prevent="onDrop">
+  <div class="mt-4 rounded-xl bg-base-800 shadow-innerdeep p-4 relative">
     <div class="flex items-center gap-3 mb-4">
       <div v-if="mode==='library'" class="flex w-full items-center flex-wrap gap-x-2 gap-y-2">
         <div class="flex items-center flex-1 min-w-0">
@@ -37,16 +36,6 @@
       <SoundList :mode="mode" :sounds="sounds" @loadMore="loadMore" @refresh="refresh" />
       <div v-if="!sounds.length" class="text-center text-accent-400 py-12">No results</div>
     </div>
-    <div v-show="isDragging" class="absolute inset-0 bg-black/40 rounded-xl grid place-items-center pointer-events-none">
-      <div class="flex flex-col items-center gap-3 text-accent-300">
-        <svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-          <polyline points="17 8 12 3 7 8"/>
-          <line x1="12" y1="3" x2="12" y2="15"/>
-        </svg>
-        <div class="text-sm">Drop to upload</div>
-      </div>
-    </div>
   </div>
 
   <div v-if="toastMessage" class="fixed inset-x-0 bottom-24 flex justify-center z-[60] pointer-events-none">
@@ -75,8 +64,6 @@ const tasks = ref<{ id: string; state: string }[]>(JSON.parse(localStorage.getIt
 const selectedTags = ref<string[]>([])
 const tagPickerOpen = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
-const isDragging = ref(false)
-const dragCounter = ref(0)
 const toastMessage = ref('')
 let toastTimer: any = null
 
@@ -88,17 +75,6 @@ function showToast(msg: string, ms = 2500) {
   toastMessage.value = msg
   if (toastTimer) clearTimeout(toastTimer)
   toastTimer = setTimeout(() => (toastMessage.value = ''), ms)
-}
-
-function onDragEnter() { dragCounter.value++; isDragging.value = true }
-function onDragOver() { isDragging.value = true }
-function onDragLeave() { dragCounter.value--; if (dragCounter.value <= 0) { isDragging.value = false; dragCounter.value = 0 } }
-async function onDrop(e: DragEvent) {
-  dragCounter.value = 0
-  isDragging.value = false
-  const files = e.dataTransfer?.files
-  if (!files || !files.length) return
-  await handleFiles(files)
 }
 
 async function onFilePicked(ev: Event) {
