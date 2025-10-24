@@ -7,19 +7,17 @@ wheels/
 *.egg-info
 .python-version
 
-# Django
-static/
-
-# Virtual environments
+# Virtual environment
 .venv
-
-# Environment file
-.env
 
 # Other
 media/
-*.log
 TODO
+
+# -- IMPORTANT --
+
+# Environment
+.env
 
 #Cloudflared
 credentials.json

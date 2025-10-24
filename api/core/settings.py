@@ -17,7 +17,7 @@ DEBUG = env.bool("DJANGO_DEBUG")
 ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
 BOT_API_KEY = env("BOT_API_KEY")
 
-CSRF_TRUSTED_ORIGINS = ["https://api.telepad.cc", "https://telepad.cc"]
+CSRF_TRUSTED_ORIGINS = ["https://telepad.cc"]
 
 # -- APPLICATIONS --
 INSTALLED_APPS = [
@@ -96,10 +96,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# -- STATIC --
-STATIC_URL = "/static/"
-STATIC_ROOT = "/static/"
-
+# -- MEDIA --
 MEDIA_URL = "/media/"
 MEDIA_ROOT = "/media/"
 
