@@ -58,13 +58,11 @@ class UploadSerializer(serializers.Serializer):
         if value.size > max_size:
             raise serializers.ValidationError(f"File size exceeds {MAX_FILESIZE_MB}MB limit")
         
-        allowed_types = [
-            'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/opus', 'audio/mp4',
-            'audio/aac', 'audio/flac', 'video/mp4', 'video/webm', 'video/quicktime'
-        ]
-        
-        if value.content_type not in allowed_types:
-            raise serializers.ValidationError("Unsupported file type")
+        allowed_exts = ('mp3','wav','ogg','oga','opus','m4a','aac','flac','mp4','m4v','webm','mov','avi')
+        file_ext = value.name.rsplit(".")[-1]
+
+        if file_ext not in allowed_exts:
+            raise serializers.ValidationError(f"Unsupported file type: {file_ext}")
         
         return value
 

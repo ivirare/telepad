@@ -92,8 +92,7 @@ async function handleFiles(fileList: FileList) {
   const name = (file.name || '').toLowerCase()
   const playableMime = mime.startsWith('audio/') || mime.startsWith('video/')
   const allowedExt = [
-    '.mp3','.wav','.ogg','.oga','.opus','.m4a','.aac','.flac','.alac','.wma','.amr',
-    '.mp4','.m4v','.webm','.mkv','.mov','.avi'
+    '.mp3','.wav','.ogg','.oga','.opus','.m4a','.aac','.flac','.mp4','.m4v','.webm','.mov','.avi'
   ]
   const hasAllowedExt = allowedExt.some(ext => name.endsWith(ext))
   if (!(playableMime || hasAllowedExt)) {
