@@ -63,7 +63,9 @@ class SoundViewSet(
         # Tags
         tag_names = self.request.query_params.getlist("tags")
         if tag_names:
-            qs = qs.filter(tags__name__in=tag_names).distinct()
+            for tag in tag_names:
+                qs = qs.filter(tags__name=tag)
+            qs = qs.distinct()
 
         # Searching
         search = self.request.query_params.get("search")
@@ -73,6 +75,8 @@ class SoundViewSet(
         # Access
         if self.action == "list":
             qs = qs.filter(saves=user)
+        elif self.action == "list_all":
+            qs = qs.filter(is_private=False)
         else:
             qs = qs.filter(Q(owner=user) | Q(is_private=False))
 

@@ -9,6 +9,8 @@ wheels/
 
 # Virtual environment
 .venv
+pyproject.toml
+uv.lock
 
 # Other
 media/
