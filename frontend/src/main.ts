@@ -22,6 +22,25 @@ axios.interceptors.request.use((config) => {
   return config
 })
 
+axios.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const auth = useAuth(pinia)
+
+    if (error.response?.status === 401 && auth.refresh) {
+      try {
+        await auth.refreshToken()
+        window.location.reload()
+      } catch (e) {
+        auth.logout()
+        window.location.reload()
+      }
+    }
+
+    return Promise.reject(error)
+  }
+)
+
 try {
   const params = new URLSearchParams(window.location.search)
   const id = params.get('id')
