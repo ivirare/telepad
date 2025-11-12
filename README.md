@@ -1,5 +1,5 @@
 ![Logo](repo/logo_large.png)
-The **Telepad** service isn’t hosted permanently and may occasionally be offline – this is a non-commercial project. Check the `uptime` badge for the current server status.
+The **Telepad** service isn’t hosted permanently and may occasionally be offline – this is a non-commercial project. Check the uptime badge for the current server status.
 
 ![Uptime Robot status](https://img.shields.io/uptimerobot/status/m801711046-3d4b109226cdcfdc2846fc84?up_message=ONLINE&down_message=OFFLINE&style=for-the-badge&logo=docker&logoColor=white)
 
